@@ -3,14 +3,16 @@
 	"version": "1.0.0",
 	"description": "This repository is to manage CLI tools for GeoHub",
 	"bin": {
-    "geohub": "dist/index.js"
-  },
+		"geohub": "dist/index.js"
+	},
 	"scripts": {
-    "dev": "./node_modules/.bin/ts-node ./src/index.ts",
-		"build": "tsc -p .",
+		"dev": "./node_modules/.bin/ts-node ./src/index.ts",
+		"build": "rimraf dist && tsc -p .",
 		"watch": "tsc -w",
 		"lint": "prettier --plugin-search-dir . --check . && eslint .",
-		"format": "prettier --plugin-search-dir . --write ."
+		"format": "prettier --plugin-search-dir . --write .",
+		"prepare": "pnpm build && lefthook install",
+		"preinstall": "npx only-allow pnpm"
 	},
 	"keywords": [],
 	"author": "",
@@ -22,10 +24,12 @@
 		"eslint": "^8.27.0",
 		"eslint-config-prettier": "^8.5.0",
 		"prettier": "^2.7.1",
+		"rimraf": "^3.0.2",
 		"ts-node": "^10.9.1",
 		"typescript": "^4.8.4"
 	},
 	"dependencies": {
+		"@arkweid/lefthook": "^0.7.7",
 		"commander": "^9.4.1"
 	}
 }

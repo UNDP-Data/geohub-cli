@@ -1,0 +1,19 @@
+pre-push:
+  parallel: true
+  commands:
+    build:
+      tags: build
+      run: pnpm build
+
+pre-commit:
+  parallel: true
+  commands:
+    lint:
+      tags: lint
+      run: pnpm lint
+    format:
+      tags: prettier
+      run: pnpm format
+    build:
+      tags: build
+      run: pnpm build

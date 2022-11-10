@@ -1,10 +1,8 @@
-import { Command } from 'commander'
-import azblob from './cli/azblob'
+import { Command } from 'commander';
+import azblob from './cli/azblob';
 
-const program = new Command()
-const version = require('../package.json').version
-program
-  .version(version, '-v, --version', 'output the version number')
-  .addCommand(azblob)
+const program = new Command();
+const version = require('../package.json').version;
+program.version(version, '-v, --version', 'output the version number').addCommand(azblob);
 
-program.parse(process.argv)
+program.parse(process.argv);
