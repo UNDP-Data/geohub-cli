@@ -1,4 +1,5 @@
 import { Command } from 'commander';
+import BlobServiceAccountManager from '../util/BlobServiceAccountManager';
 
 const program = new Command();
 program
@@ -18,6 +19,10 @@ program
 		const azaccountkey: string = options.azaccountkey;
 		const containerNames: string[] = options.name;
 		console.log({ database, azaccount, azaccountkey, containerNames });
+
+		const blobManager = new BlobServiceAccountManager(azaccount, azaccountkey);
+		const containers = await blobManager.listContainers();
+		await blobManager.register(containers);
 	});
 
 export default program;
