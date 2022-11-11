@@ -3,9 +3,9 @@
     "version": "2.2.11",
     "width": 2000,
     "height": 2000,
-    "scrollTop": 0,
-    "scrollLeft": 0,
-    "zoomLevel": 0.8,
+    "scrollTop": -188,
+    "scrollLeft": -107,
+    "zoomLevel": 0.9,
     "show": {
       "tableComment": true,
       "columnComment": true,
@@ -48,8 +48,8 @@
         "columns": [
           {
             "name": "id",
-            "comment": "unique ID for data",
-            "dataType": "serial",
+            "comment": "md5 hash generated from URL",
+            "dataType": "character varying",
             "default": "",
             "option": {
               "autoIncrement": false,
@@ -63,8 +63,8 @@
               "fk": false,
               "pfk": false,
               "widthName": 60,
-              "widthComment": 118.89590454101562,
-              "widthDataType": 60,
+              "widthComment": 120,
+              "widthDataType": 115.04789733886719,
               "widthDefault": 60
             },
             "id": "6739c38f-4385-4b45-8c01-0f3948df0b7e"
@@ -72,7 +72,7 @@
           {
             "name": "storage_id",
             "comment": "storage ID",
-            "dataType": "serial",
+            "dataType": "character varying",
             "default": "",
             "option": {
               "autoIncrement": false,
@@ -87,7 +87,7 @@
               "pfk": false,
               "widthName": 69.24893188476562,
               "widthComment": 68.6639404296875,
-              "widthDataType": 60,
+              "widthDataType": 115.04789733886719,
               "widthDefault": 60
             },
             "id": "bfc6201d-27b2-4347-98ee-fc0d2a615b99"
@@ -141,7 +141,7 @@
           {
             "name": "source",
             "comment": "data source",
-            "dataType": "charaster varying",
+            "dataType": "character varying",
             "default": "",
             "option": {
               "autoIncrement": false,
@@ -156,7 +156,7 @@
               "pfk": false,
               "widthName": 60,
               "widthComment": 78.66093444824219,
-              "widthDataType": 114.514892578125,
+              "widthDataType": 115.04789733886719,
               "widthDefault": 60
             },
             "id": "d07a01f2-a9f7-413f-b660-5e464b63efb4"
@@ -164,7 +164,7 @@
           {
             "name": "license",
             "comment": "data license",
-            "dataType": "charaster varying",
+            "dataType": "character varying",
             "default": "",
             "option": {
               "autoIncrement": false,
@@ -179,7 +179,7 @@
               "pfk": false,
               "widthName": 60,
               "widthComment": 78.69992065429688,
-              "widthDataType": 114.514892578125,
+              "widthDataType": 115.04789733886719,
               "widthDefault": 60
             },
             "id": "2423d162-dd64-4d7c-bb6f-1f42f1d631fb"
@@ -187,7 +187,7 @@
           {
             "name": "bounds",
             "comment": "bounds of data",
-            "dataType": "geometry (4326, Polygon)",
+            "dataType": "geometry (Polygon, 4326)",
             "default": "",
             "option": {
               "autoIncrement": false,
@@ -258,7 +258,7 @@
           "active": false,
           "left": 125.1019,
           "top": 218.2722,
-          "zIndex": 6,
+          "zIndex": 10,
           "widthName": 101.83992004394531,
           "widthComment": 120
         },
@@ -341,9 +341,9 @@
         ],
         "ui": {
           "active": false,
-          "left": 797.8828,
-          "top": 594.6857,
-          "zIndex": 8,
+          "left": 815.4385,
+          "top": 482.7973,
+          "zIndex": 2,
           "widthName": 74.57894897460938,
           "widthComment": 120
         },
@@ -356,8 +356,8 @@
         "columns": [
           {
             "name": "dataset_id",
-            "comment": "unique ID for metadata",
-            "dataType": "serial",
+            "comment": "unique ID for dataset",
+            "dataType": "character varying",
             "default": "",
             "option": {
               "autoIncrement": false,
@@ -372,7 +372,7 @@
               "pfk": false,
               "widthName": 68.169921875,
               "widthComment": 120,
-              "widthDataType": 60,
+              "widthDataType": 115.04789733886719,
               "widthDefault": 60
             },
             "id": "9fb397ae-ab61-468b-ac2a-a1a0d0345c86"
@@ -403,9 +403,9 @@
         ],
         "ui": {
           "active": false,
-          "left": 817.3946,
-          "top": 385.488,
-          "zIndex": 11,
+          "left": 850.8389,
+          "top": 231.9326,
+          "zIndex": 4,
           "widthName": 129.2568817138672,
           "widthComment": 120
         },
@@ -413,13 +413,13 @@
         "id": "8951ee6c-ebd2-4424-a816-edf4018ee186"
       },
       {
-        "name": "geohub.sdg",
-        "comment": "",
+        "name": "geohub.storage",
+        "comment": "manges storage",
         "columns": [
           {
             "name": "id",
-            "comment": "SDG numbr",
-            "dataType": "integer",
+            "comment": "md5 hash generated from URL",
+            "dataType": "character varying",
             "default": "",
             "option": {
               "autoIncrement": false,
@@ -433,15 +433,15 @@
               "fk": false,
               "pfk": false,
               "widthName": 60,
-              "widthComment": 76.8409423828125,
-              "widthDataType": 60,
+              "widthComment": 120,
+              "widthDataType": 115.04789733886719,
               "widthDefault": 60
             },
-            "id": "b2e9bc5e-f49e-4e6e-a7ef-c22f663381b6"
+            "id": "e4675c3f-96af-4dd2-86aa-a799a65bc090"
           },
           {
             "name": "name",
-            "comment": "SDG goal name",
+            "comment": "name",
             "dataType": "character varying",
             "default": "",
             "option": {
@@ -456,55 +456,16 @@
               "fk": false,
               "pfk": false,
               "widthName": 60,
-              "widthComment": 101.21591186523438,
+              "widthComment": 60,
               "widthDataType": 115.04789733886719,
               "widthDefault": 60
             },
-            "id": "f341d392-eb60-452c-ae89-c8489a4082ff"
-          }
-        ],
-        "ui": {
-          "active": false,
-          "left": 1411.8478,
-          "top": 192.4982,
-          "zIndex": 1,
-          "widthName": 77.38694763183594,
-          "widthComment": 60
-        },
-        "visible": true,
-        "id": "825860f7-45e6-440b-ae23-1611bce57135"
-      },
-      {
-        "name": "geohub.dataset_sdg",
-        "comment": "",
-        "columns": [
-          {
-            "name": "dataset_id",
-            "comment": "unique ID for data",
-            "dataType": "serial",
-            "default": "",
-            "option": {
-              "autoIncrement": false,
-              "primaryKey": false,
-              "unique": false,
-              "notNull": true
-            },
-            "ui": {
-              "active": false,
-              "pk": false,
-              "fk": true,
-              "pfk": false,
-              "widthName": 68.169921875,
-              "widthComment": 118.89590454101562,
-              "widthDataType": 60,
-              "widthDefault": 60
-            },
-            "id": "a6c5d6cb-15cf-46e5-baac-4e6d35f1cc25"
+            "id": "92d455d7-1fe8-40f7-bfb1-0661338b8cde"
           },
           {
-            "name": "sdg_id",
-            "comment": "SDG number",
-            "dataType": "integer",
+            "name": "url",
+            "comment": "",
+            "dataType": "character varying",
             "default": "",
             "option": {
               "autoIncrement": false,
@@ -515,57 +476,18 @@
             "ui": {
               "active": false,
               "pk": false,
-              "fk": true,
-              "pfk": false,
-              "widthName": 60,
-              "widthComment": 84.48493957519531,
-              "widthDataType": 60,
-              "widthDefault": 60
-            },
-            "id": "cc24d209-1ba0-467f-89f5-687a7dd0a13a"
-          }
-        ],
-        "ui": {
-          "active": false,
-          "left": 797.2333,
-          "top": 202.8999,
-          "zIndex": 7,
-          "widthName": 132.06488037109375,
-          "widthComment": 60
-        },
-        "visible": true,
-        "id": "40cab4b6-ee34-47e6-a69d-5c33dd82a3a5"
-      },
-      {
-        "name": "geohub.storage",
-        "comment": "manges storage",
-        "columns": [
-          {
-            "name": "id",
-            "comment": "storage type ID",
-            "dataType": "serial",
-            "default": "",
-            "option": {
-              "autoIncrement": false,
-              "primaryKey": true,
-              "unique": false,
-              "notNull": true
-            },
-            "ui": {
-              "active": false,
-              "pk": true,
               "fk": false,
               "pfk": false,
               "widthName": 60,
-              "widthComment": 101.34591674804688,
-              "widthDataType": 60,
+              "widthComment": 60,
+              "widthDataType": 115.04789733886719,
               "widthDefault": 60
             },
-            "id": "e4675c3f-96af-4dd2-86aa-a799a65bc090"
+            "id": "6b6a0dee-334c-4364-8259-e6785d41d19d"
           },
           {
-            "name": "name",
-            "comment": "storage name. container name for Azure Blob.",
+            "name": "label",
+            "comment": "label for visualising",
             "dataType": "character varying",
             "default": "",
             "option": {
@@ -584,7 +506,7 @@
               "widthDataType": 115.04789733886719,
               "widthDefault": 60
             },
-            "id": "92d455d7-1fe8-40f7-bfb1-0661338b8cde"
+            "id": "caf8fd65-c9ee-4c6f-8531-30765c8b7fa6"
           },
           {
             "name": "description",
@@ -612,7 +534,7 @@
           {
             "name": "icon",
             "comment": "fontawesome icon name or icon URL",
-            "dataType": "charaster varying",
+            "dataType": "character varying",
             "default": "",
             "option": {
               "autoIncrement": false,
@@ -627,7 +549,7 @@
               "pfk": false,
               "widthName": 60,
               "widthComment": 120,
-              "widthDataType": 114.514892578125,
+              "widthDataType": 115.04789733886719,
               "widthDefault": 60
             },
             "id": "9fc9bffa-d5b5-4c4c-ad56-87e9c816dd5b"
@@ -635,9 +557,9 @@
         ],
         "ui": {
           "active": false,
-          "left": 148.839,
-          "top": 699.9414,
-          "zIndex": 2,
+          "left": 127.839,
+          "top": 708.9414,
+          "zIndex": 6,
           "widthName": 102.91893005371094,
           "widthComment": 106.14291381835938
         },
@@ -745,7 +667,7 @@
           "active": false,
           "left": 150.885,
           "top": 948.2498,
-          "zIndex": 3,
+          "zIndex": 1,
           "widthName": 83.61393737792969,
           "widthComment": 120
         },
@@ -759,7 +681,7 @@
           {
             "name": "storage_id",
             "comment": "storage type ID",
-            "dataType": "serial",
+            "dataType": "character varying",
             "default": "",
             "option": {
               "autoIncrement": false,
@@ -774,7 +696,7 @@
               "pfk": false,
               "widthName": 69.24893188476562,
               "widthComment": 101.34591674804688,
-              "widthDataType": 60,
+              "widthDataType": 115.04789733886719,
               "widthDefault": 60
             },
             "id": "b511b468-3eb0-4fcd-900d-a2b5f219b7d2"
@@ -805,9 +727,9 @@
         ],
         "ui": {
           "active": false,
-          "left": 821,
-          "top": 847,
-          "zIndex": 4,
+          "left": 829.8891,
+          "top": 738.0004,
+          "zIndex": 3,
           "widthName": 130.3358917236328,
           "widthComment": 120
         },
@@ -831,8 +753,8 @@
           "columnIds": [
             "2d3425f3-e191-43ee-9a75-8ca1b50f49af"
           ],
-          "x": 1028.9067486694335,
-          "y": 594.6857,
+          "x": 1046.4624486694336,
+          "y": 482.7973,
           "direction": "top"
         },
         "end": {
@@ -840,8 +762,8 @@
           "columnIds": [
             "6ecc298b-9b0c-4a45-b3df-24aae5ecf389"
           ],
-          "x": 1024.9795609375,
-          "y": 495.488,
+          "x": 1085.9478096069336,
+          "y": 341.9326,
           "direction": "bottom"
         },
         "constraintName": "fk_tag_to_tags",
@@ -858,7 +780,7 @@
             "6739c38f-4385-4b45-8c01-0f3948df0b7e"
           ],
           "x": 651.7787188476563,
-          "y": 408.3972,
+          "y": 345.0222,
           "direction": "right"
         },
         "end": {
@@ -866,8 +788,8 @@
           "columnIds": [
             "9fb397ae-ab61-468b-ac2a-a1a0d0345c86"
           ],
-          "x": 817.3946,
-          "y": 440.488,
+          "x": 850.8389,
+          "y": 286.9326,
           "direction": "left"
         },
         "constraintName": "fk_file_metadata_to_tags",
@@ -879,64 +801,12 @@
         "relationshipType": "OneN",
         "startRelationshipType": "Dash",
         "start": {
-          "tableId": "825860f7-45e6-440b-ae23-1611bce57135",
-          "columnIds": [
-            "b2e9bc5e-f49e-4e6e-a7ef-c22f663381b6"
-          ],
-          "x": 1411.8478,
-          "y": 247.4982,
-          "direction": "left"
-        },
-        "end": {
-          "tableId": "40cab4b6-ee34-47e6-a69d-5c33dd82a3a5",
-          "columnIds": [
-            "cc24d209-1ba0-467f-89f5-687a7dd0a13a"
-          ],
-          "x": 1211.2991264160155,
-          "y": 257.8999,
-          "direction": "right"
-        },
-        "constraintName": "fk_sdg_to_sdgs",
-        "visible": true,
-        "id": "2b948aec-14af-4f7a-8cc3-874810b025ec"
-      },
-      {
-        "identification": false,
-        "relationshipType": "OneN",
-        "startRelationshipType": "Dash",
-        "start": {
-          "tableId": "6d8bc276-7cd1-43ce-95a2-df870a3f108c",
-          "columnIds": [
-            "6739c38f-4385-4b45-8c01-0f3948df0b7e"
-          ],
-          "x": 651.7787188476563,
-          "y": 281.6472,
-          "direction": "right"
-        },
-        "end": {
-          "tableId": "40cab4b6-ee34-47e6-a69d-5c33dd82a3a5",
-          "columnIds": [
-            "a6c5d6cb-15cf-46e5-baac-4e6d35f1cc25"
-          ],
-          "x": 797.2333,
-          "y": 257.8999,
-          "direction": "left"
-        },
-        "constraintName": "fk_metadata_to_sdgs",
-        "visible": true,
-        "id": "272933ca-fb62-4597-be1f-5b85b4d3ae53"
-      },
-      {
-        "identification": false,
-        "relationshipType": "OneN",
-        "startRelationshipType": "Dash",
-        "start": {
           "tableId": "886c1f9a-04fb-4ce3-acf0-5bda75d74117",
           "columnIds": [
             "e4675c3f-96af-4dd2-86aa-a799a65bc090"
           ],
-          "x": 386.85341955566406,
-          "y": 699.9414,
+          "x": 365.85341955566406,
+          "y": 708.9414,
           "direction": "top"
         },
         "end": {
@@ -961,8 +831,8 @@
           "columnIds": [
             "2d3425f3-e191-43ee-9a75-8ca1b50f49af"
           ],
-          "x": 1028.9067486694335,
-          "y": 725.1857,
+          "x": 1046.4624486694336,
+          "y": 613.2973,
           "direction": "bottom"
         },
         "end": {
@@ -970,8 +840,8 @@
           "columnIds": [
             "30b8e885-5bb3-4892-a927-77174b9d302a"
           ],
-          "x": 1029.1244659423828,
-          "y": 847,
+          "x": 1065.5375146118163,
+          "y": 738.0004,
           "direction": "top"
         },
         "constraintName": "fk_geohub.tag_to_geohub.storage_tag",
@@ -987,8 +857,8 @@
           "columnIds": [
             "e4675c3f-96af-4dd2-86aa-a799a65bc090"
           ],
-          "x": 624.8678391113281,
-          "y": 775.4414,
+          "x": 603.8678391113281,
+          "y": 804.9414,
           "direction": "right"
         },
         "end": {
@@ -996,8 +866,8 @@
           "columnIds": [
             "b511b468-3eb0-4fcd-900d-a2b5f219b7d2"
           ],
-          "x": 821,
-          "y": 902,
+          "x": 829.8891,
+          "y": 793.0004,
           "direction": "left"
         },
         "constraintName": "fk_geohub.storage_to_geohub.storage_tag",
