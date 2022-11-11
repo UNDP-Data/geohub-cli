@@ -1,8 +1,9 @@
 import { Command } from 'commander';
-import BlobServiceAccountManager from '../util/BlobServiceAccountManager';
 import fs from 'fs';
 import path from 'path';
 import { Tag } from '../interfaces';
+import BlobServiceAccountManager from '../util/BlobServiceAccountManager';
+import DatabaseManager from '../util/DatabaseManager';
 
 const program = new Command();
 program
@@ -17,19 +18,25 @@ program
 	)
 	.action(async () => {
 		const options = program.opts();
-		// const database: string = options.database;
+		const database: string = options.database;
 		const azaccount: string = options.azaccount;
 		const azaccountkey: string = options.azaccountkey;
 		const containerNames: string[] = options.name;
-		// console.log({ database, azaccount, azaccountkey, containerNames });
+
+		console.debug(
+			`loaded parameters: ${JSON.stringify({ database, azaccount, azaccountkey, containerNames })}`
+		);
 
 		const blobManager = new BlobServiceAccountManager(azaccount, azaccountkey);
 		const promises = containerNames.map((name) => blobManager.listContainers(name));
+		console.debug(`loaded ${promises.length} containers.`);
 		const _storages = await Promise.all(promises);
-		const storages = _storages.flat();
-		const datasets = await blobManager.scanContainers(storages);
+		let storages = _storages.flat();
+		console.debug(`generated ${storages.length} container objects`);
+		let datasets = await blobManager.scanContainers(storages);
+		console.debug(`generated ${datasets.length} dataset objects`);
 
-		const tags: Tag[] = [];
+		let tags: Tag[] = [];
 		storages.forEach((storage) => {
 			storage.tags.forEach((x) => {
 				const tag = tags.find((y) => y.value === x.value && y.key === x.key);
@@ -48,15 +55,41 @@ program
 			});
 		});
 
-		fs.writeFileSync(path.resolve(__dirname, '../../tags.json'), JSON.stringify(tags, null, 4));
-		fs.writeFileSync(
-			path.resolve(__dirname, '../../storages.json'),
-			JSON.stringify(storages, null, 4)
-		);
-		fs.writeFileSync(
-			path.resolve(__dirname, '../../datasets.json'),
-			JSON.stringify(datasets, null, 4)
-		);
+		const dbManager = new DatabaseManager(database);
+		console.debug(`database manager was generated.`);
+
+		tags = await dbManager.insertTags(tags);
+		console.debug(`${tags.length} tags were registered into PostGIS.`);
+
+		storages.forEach((storage) => {
+			storage.tags.forEach((x) => {
+				const tag = tags.find((y) => y.value === x.value && y.key === x.key);
+				x.id = tag?.id;
+			});
+		});
+
+		datasets.forEach((dataset) => {
+			dataset.tags?.forEach((x) => {
+				const tag = tags.find((y) => y.value === x.value && y.key === x.key);
+				x.id = tag?.id;
+			});
+		});
+
+		storages = await dbManager.insertStorages(storages);
+		console.debug(`${storages.length} storages were registered into PostGIS.`);
+
+		datasets = await dbManager.insertDatasets(datasets);
+		console.debug(`${datasets.length} datasets were registered into PostGIS.`);
+
+		[
+			{ file: 'tags.json', data: tags },
+			{ file: 'storages.json', data: storages },
+			{ file: 'datasets.json', data: datasets }
+		].forEach((data) => {
+			const filePath = path.resolve(__dirname, `../../${data.file}`);
+			fs.writeFileSync(filePath, JSON.stringify(data.data, null, 4));
+			console.debug(`exported ${filePath}`);
+		});
 	});
 
 export default program;

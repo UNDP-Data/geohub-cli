@@ -20,6 +20,7 @@
 	"devDependencies": {
 		"@types/cli-progress": "^3.11.0",
 		"@types/node": "^18.11.9",
+		"@types/pg": "^8.6.5",
 		"@typescript-eslint/eslint-plugin": "^5.42.1",
 		"@typescript-eslint/parser": "^5.42.1",
 		"eslint": "^8.27.0",
@@ -33,6 +34,7 @@
 		"@arkweid/lefthook": "^0.7.7",
 		"@azure/storage-blob": "^12.12.0",
 		"commander": "^9.4.1",
-		"crypto": "^1.0.1"
+		"crypto": "^1.0.1",
+		"pg": "^8.8.0"
 	}
 }
