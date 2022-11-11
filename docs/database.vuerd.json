@@ -4,7 +4,7 @@
     "width": 2000,
     "height": 2000,
     "scrollTop": 0,
-    "scrollLeft": -66,
+    "scrollLeft": 0,
     "zoomLevel": 1,
     "show": {
       "tableComment": true,
@@ -43,7 +43,7 @@
   "table": {
     "tables": [
       {
-        "name": "geohub.metadata",
+        "name": "geohub.dataset",
         "comment": "this table manages metadata of files",
         "columns": [
           {
@@ -185,7 +185,7 @@
             "id": "2423d162-dd64-4d7c-bb6f-1f42f1d631fb"
           },
           {
-            "name": "geom",
+            "name": "bounds",
             "comment": "bounds of data",
             "dataType": "geometry (4326, Polygon)",
             "default": "",
@@ -256,10 +256,10 @@
         ],
         "ui": {
           "active": false,
-          "left": 132.8794,
-          "top": 227.161,
-          "zIndex": 5,
-          "widthName": 114.43692016601562,
+          "left": 125.1019,
+          "top": 218.2722,
+          "zIndex": 40,
+          "widthName": 101.83992004394531,
           "widthComment": 120
         },
         "visible": true,
@@ -316,8 +316,8 @@
             "id": "2f0869c6-8f5c-4119-b9b9-7f6babd98420"
           },
           {
-            "name": "category",
-            "comment": "tag category",
+            "name": "key",
+            "comment": "tag key",
             "dataType": "character varying",
             "default": "",
             "option": {
@@ -332,7 +332,7 @@
               "fk": false,
               "pfk": false,
               "widthName": 60,
-              "widthComment": 84.21192932128906,
+              "widthComment": 60,
               "widthDataType": 115.04789733886719,
               "widthDefault": 60
             },
@@ -341,9 +341,9 @@
         ],
         "ui": {
           "active": false,
-          "left": 798.9943,
-          "top": 610.2411,
-          "zIndex": 3,
+          "left": 797.8828,
+          "top": 594.6857,
+          "zIndex": 58,
           "widthName": 74.57894897460938,
           "widthComment": 120
         },
@@ -355,7 +355,7 @@
         "comment": "this table connects file_metadata and tag tables",
         "columns": [
           {
-            "name": "metadata_id",
+            "name": "dataset_id",
             "comment": "unique ID for metadata",
             "dataType": "serial",
             "default": "",
@@ -370,7 +370,7 @@
               "pk": false,
               "fk": true,
               "pfk": false,
-              "widthName": 80.76692199707031,
+              "widthName": 68.169921875,
               "widthComment": 120,
               "widthDataType": 60,
               "widthDefault": 60
@@ -405,7 +405,7 @@
           "active": false,
           "left": 817.3946,
           "top": 385.488,
-          "zIndex": 7,
+          "zIndex": 38,
           "widthName": 141.8538818359375,
           "widthComment": 120
         },
@@ -475,11 +475,11 @@
         "id": "825860f7-45e6-440b-ae23-1611bce57135"
       },
       {
-        "name": "geohub.metadata_sdg",
+        "name": "geohub.dataset_sdg",
         "comment": "",
         "columns": [
           {
-            "name": "metadata_id",
+            "name": "dataset_id",
             "comment": "unique ID for data",
             "dataType": "serial",
             "default": "",
@@ -494,7 +494,7 @@
               "pk": false,
               "fk": true,
               "pfk": false,
-              "widthName": 80.76692199707031,
+              "widthName": 68.169921875,
               "widthComment": 118.89590454101562,
               "widthDataType": 60,
               "widthDefault": 60
@@ -527,10 +527,10 @@
         ],
         "ui": {
           "active": false,
-          "left": 783.8998,
-          "top": 200.6777,
-          "zIndex": 6,
-          "widthName": 144.66188049316406,
+          "left": 797.2333,
+          "top": 202.8999,
+          "zIndex": 41,
+          "widthName": 132.06488037109375,
           "widthComment": 60
         },
         "visible": true,
@@ -831,8 +831,8 @@
           "columnIds": [
             "2d3425f3-e191-43ee-9a75-8ca1b50f49af"
           ],
-          "x": 1030.0182486694334,
-          "y": 610.2411,
+          "x": 1028.9067486694335,
+          "y": 594.6857,
           "direction": "top"
         },
         "end": {
@@ -840,7 +840,7 @@
           "columnIds": [
             "6ecc298b-9b0c-4a45-b3df-24aae5ecf389"
           ],
-          "x": 1031.2780609985352,
+          "x": 1024.9795609375,
           "y": 495.488,
           "direction": "bottom"
         },
@@ -857,8 +857,8 @@
           "columnIds": [
             "6739c38f-4385-4b45-8c01-0f3948df0b7e"
           ],
-          "x": 659.5562188476563,
-          "y": 417.286,
+          "x": 651.7787188476563,
+          "y": 408.3972,
           "direction": "right"
         },
         "end": {
@@ -892,8 +892,8 @@
           "columnIds": [
             "cc24d209-1ba0-467f-89f5-687a7dd0a13a"
           ],
-          "x": 1210.562626538086,
-          "y": 255.6777,
+          "x": 1211.2991264160155,
+          "y": 257.8999,
           "direction": "right"
         },
         "constraintName": "fk_sdg_to_sdgs",
@@ -909,8 +909,8 @@
           "columnIds": [
             "6739c38f-4385-4b45-8c01-0f3948df0b7e"
           ],
-          "x": 659.5562188476563,
-          "y": 290.536,
+          "x": 651.7787188476563,
+          "y": 281.6472,
           "direction": "right"
         },
         "end": {
@@ -918,8 +918,8 @@
           "columnIds": [
             "a6c5d6cb-15cf-46e5-baac-4e6d35f1cc25"
           ],
-          "x": 783.8998,
-          "y": 255.6777,
+          "x": 797.2333,
+          "y": 257.8999,
           "direction": "left"
         },
         "constraintName": "fk_metadata_to_sdgs",
@@ -944,8 +944,8 @@
           "columnIds": [
             "bfc6201d-27b2-4347-98ee-fc0d2a615b99"
           ],
-          "x": 396.21780942382816,
-          "y": 480.661,
+          "x": 388.4403094238281,
+          "y": 471.7722,
           "direction": "bottom"
         },
         "constraintName": "fk_data_type_to_metadata",
@@ -961,8 +961,8 @@
           "columnIds": [
             "2d3425f3-e191-43ee-9a75-8ca1b50f49af"
           ],
-          "x": 1030.0182486694334,
-          "y": 740.7411,
+          "x": 1028.9067486694335,
+          "y": 725.1857,
           "direction": "bottom"
         },
         "end": {
