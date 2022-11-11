@@ -5,7 +5,7 @@
     "height": 2000,
     "scrollTop": 0,
     "scrollLeft": 0,
-    "zoomLevel": 1,
+    "zoomLevel": 0.8,
     "show": {
       "tableComment": true,
       "columnComment": true,
@@ -258,7 +258,7 @@
           "active": false,
           "left": 125.1019,
           "top": 218.2722,
-          "zIndex": 40,
+          "zIndex": 6,
           "widthName": 101.83992004394531,
           "widthComment": 120
         },
@@ -343,7 +343,7 @@
           "active": false,
           "left": 797.8828,
           "top": 594.6857,
-          "zIndex": 58,
+          "zIndex": 8,
           "widthName": 74.57894897460938,
           "widthComment": 120
         },
@@ -351,7 +351,7 @@
         "id": "d20659b4-0aef-4283-8fad-8b0e1f97d480"
       },
       {
-        "name": "geohub.metadata_tag",
+        "name": "geohub.dataset_tag",
         "comment": "this table connects file_metadata and tag tables",
         "columns": [
           {
@@ -405,8 +405,8 @@
           "active": false,
           "left": 817.3946,
           "top": 385.488,
-          "zIndex": 38,
-          "widthName": 141.8538818359375,
+          "zIndex": 11,
+          "widthName": 129.2568817138672,
           "widthComment": 120
         },
         "visible": true,
@@ -529,7 +529,7 @@
           "active": false,
           "left": 797.2333,
           "top": 202.8999,
-          "zIndex": 41,
+          "zIndex": 7,
           "widthName": 132.06488037109375,
           "widthComment": 60
         },
@@ -745,7 +745,7 @@
           "active": false,
           "left": 150.885,
           "top": 948.2498,
-          "zIndex": 4,
+          "zIndex": 3,
           "widthName": 83.61393737792969,
           "widthComment": 120
         },
@@ -807,7 +807,7 @@
           "active": false,
           "left": 821,
           "top": 847,
-          "zIndex": 8,
+          "zIndex": 4,
           "widthName": 130.3358917236328,
           "widthComment": 120
         },
