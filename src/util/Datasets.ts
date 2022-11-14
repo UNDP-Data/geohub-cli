@@ -1,5 +1,8 @@
 import { PoolClient } from 'pg';
-import { concurrentPromise } from '../helpers';
+import { from as copyFrom } from 'pg-copy-streams';
+import wkx from 'wkx';
+import fs from 'fs';
+import path from 'path';
 import { Dataset, Tag } from '../interfaces';
 
 class Datasets {
@@ -29,9 +32,48 @@ class Datasets {
 			ids.push(id);
 		});
 		await this.clearAll(client, ids);
-		const promises = this.datasets.map((dataset) => this.insert(client, dataset));
-		this.datasets = await concurrentPromise(promises, 10);
+
+		this.datasets = await this.bulkInsert(client, this.datasets);
 		return this.datasets;
+	}
+
+	private bulkInsert(client: PoolClient, datasets: Dataset[]) {
+		const tsvFile = path.resolve(__dirname, `../../datasets.tsv`);
+		if (fs.existsSync(tsvFile)) {
+			fs.unlinkSync(tsvFile);
+		}
+		datasets.forEach((dataset) => {
+			const wkt = `POLYGON((${dataset.bounds[0]} ${dataset.bounds[1]},${dataset.bounds[2]} ${dataset.bounds[1]},${dataset.bounds[2]} ${dataset.bounds[3]},${dataset.bounds[0]} ${dataset.bounds[3]},${dataset.bounds[0]} ${dataset.bounds[1]}))`;
+			const geometry = wkx.Geometry.parse(wkt);
+
+			const values = [
+				dataset.id,
+				dataset.storage.id,
+				dataset.url,
+				dataset.is_raster,
+				dataset.source || '',
+				dataset.license || '',
+				Buffer.from(geometry.toWkb()).toString('hex'),
+				dataset.createdat,
+				dataset.updatedat
+			];
+			fs.appendFileSync(tsvFile, `${values.join('\t')}\n`);
+		});
+
+		return new Promise<Dataset[]>((resolve, reject) => {
+			const stream = client.query(
+				copyFrom(
+					'COPY geohub.dataset (id, storage_id, url, is_raster, source, license, bounds, createdat, updatedat) FROM STDIN'
+				)
+			);
+			const fileStream = fs.createReadStream(tsvFile);
+			fileStream.on('error', reject);
+			stream.on('error', reject);
+			stream.on('finish', () => {
+				resolve(datasets);
+			});
+			fileStream.pipe(stream);
+		});
 	}
 
 	private async clearAll(client: PoolClient, storageIds: string[]) {

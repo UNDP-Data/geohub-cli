@@ -1,11 +1,8 @@
 import {
 	BlobServiceClient,
 	ContainerClient,
-	// ContainerItem,
 	ServiceListContainersOptions,
 	StorageSharedKeyCredential
-	// generateBlobSASQueryParameters,
-	// BlobSASPermissions
 } from '@azure/storage-blob';
 import type { ContainerMetadata, Dataset, Storage, Tag } from '../interfaces';
 import {
@@ -76,9 +73,12 @@ class BlobServiceAccountManager {
 	}
 
 	public async scanContainers(storages: Storage[]) {
-		const promises = storages.map((storage) => this.scanContainer(storage));
-		const result = await concurrentPromise(promises, 5);
-		return result.flat();
+		let datasets: Dataset[] = [];
+		for (const storage of storages) {
+			const res = await this.scanContainer(storage);
+			datasets = [...datasets, ...res];
+		}
+		return datasets;
 	}
 
 	public async scanContainer(storage: Storage) {
@@ -110,7 +110,7 @@ class BlobServiceAccountManager {
 				promises.push(this.createDataset(containerClient, storage, item.name));
 			}
 		}
-		const res = await concurrentPromise(promises, 10);
+		const res = await concurrentPromise(promises, 5);
 		res.forEach((dataset) => {
 			if (!dataset) return;
 			datasets.push(dataset);
