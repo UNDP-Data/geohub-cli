@@ -73,10 +73,13 @@ class BlobServiceAccountManager {
 	}
 
 	public async scanContainers(storages: Storage[]) {
-		let datasets: Dataset[] = [];
+		const datasets: Dataset[] = [];
 		for (const storage of storages) {
-			const res = await this.scanContainer(storage);
-			datasets = [...datasets, ...res];
+			const promises = await this.scanContainer(storage);
+			console.debug(`${promises.length} datasets start loading`);
+			const result = await concurrentPromise(promises, 50);
+			Array.prototype.push.apply(datasets, result);
+			console.debug(`${promises.length} datasets ended loading`);
 		}
 		return datasets;
 	}
@@ -84,14 +87,13 @@ class BlobServiceAccountManager {
 	public async scanContainer(storage: Storage) {
 		console.debug(`${storage.name} started scanning`);
 		const containerClient = this.blobServiceClient.getContainerClient(storage.name);
-		const datasets = await this.listBlobs(containerClient, storage);
-		console.debug(`${storage.name} ended scanning ${datasets.length} datasets`);
-		return datasets;
+		const promises = await this.listBlobs(containerClient, storage);
+		console.debug(`${storage.name} ended scanning ${promises.length} datasets`);
+		return promises;
 	}
 
 	public async listBlobs(containerClient: ContainerClient, storage: Storage, path?: string) {
-		let datasets: Dataset[] = [];
-		const promises = [];
+		let promises: Promise<Dataset | undefined>[] = [];
 		for await (const item of containerClient.listBlobsByHierarchy('/', { prefix: path })) {
 			if (item.kind === 'prefix') {
 				// folder
@@ -101,22 +103,16 @@ class BlobServiceAccountManager {
 				if (isVectorTile) {
 					promises.push(this.createDataset(containerClient, storage, metadataJsonFileName));
 				} else {
-					const dataset = await this.listBlobs(containerClient, storage, item.name);
-					if (dataset.length === 0) continue;
-					datasets = [...datasets, ...dataset];
+					const res = await this.listBlobs(containerClient, storage, item.name);
+					if (res.length === 0) continue;
+					promises = [...promises, ...res];
 				}
 			} else {
 				// blob
 				promises.push(this.createDataset(containerClient, storage, item.name));
 			}
 		}
-		const res = await concurrentPromise(promises, 5);
-		res.forEach((dataset) => {
-			if (!dataset) return;
-			datasets.push(dataset);
-		});
-		// console.debug(`${storage.name} loaded ${datasets.length} datasets...`);
-		return datasets;
+		return promises;
 	}
 
 	private async createDataset(
