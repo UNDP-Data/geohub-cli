@@ -18,12 +18,12 @@ class Storages {
 	}
 
 	public async insertAll(client: PoolClient) {
-		const promises = this.storages.map((storage) => this.insert(client, storage));
+		const promises = this.storages.map((storage) => this.upsert(client, storage));
 		this.storages = await concurrentPromise(promises, 10);
 		return this.storages;
 	}
 
-	public async insert(client: PoolClient, storage: Storage) {
+	public async upsert(client: PoolClient, storage: Storage) {
 		let query = {
 			text: `
                 INSERT INTO geohub.storage (id, name, url, label, description, icon) 

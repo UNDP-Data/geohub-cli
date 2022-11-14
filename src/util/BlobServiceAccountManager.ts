@@ -91,6 +91,7 @@ class BlobServiceAccountManager {
 
 	public async listBlobs(containerClient: ContainerClient, storage: Storage, path?: string) {
 		let datasets: Dataset[] = [];
+		const promises = [];
 		for await (const item of containerClient.listBlobsByHierarchy('/', { prefix: path })) {
 			if (item.kind === 'prefix') {
 				// folder
@@ -98,9 +99,7 @@ class BlobServiceAccountManager {
 				const bclient = containerClient.getBlobClient(metadataJsonFileName);
 				const isVectorTile: boolean = await bclient.exists();
 				if (isVectorTile) {
-					const dataset = await this.createDataset(containerClient, storage, metadataJsonFileName);
-					if (!dataset) continue;
-					datasets.push(dataset);
+					promises.push(this.createDataset(containerClient, storage, metadataJsonFileName));
 				} else {
 					const dataset = await this.listBlobs(containerClient, storage, item.name);
 					if (dataset.length === 0) continue;
@@ -108,11 +107,15 @@ class BlobServiceAccountManager {
 				}
 			} else {
 				// blob
-				const dataset = await this.createDataset(containerClient, storage, item.name);
-				if (!dataset) continue;
-				datasets.push(dataset);
+				promises.push(this.createDataset(containerClient, storage, item.name));
 			}
 		}
+		const res = await concurrentPromise(promises, 10);
+		res.forEach((dataset) => {
+			if (!dataset) return;
+			datasets.push(dataset);
+		});
+		// console.debug(`${storage.name} loaded ${datasets.length} datasets...`);
 		return datasets;
 	}
 
@@ -169,7 +172,7 @@ class BlobServiceAccountManager {
 		const apiUrl = `https://titiler.undpgeohub.org/cog/bounds?url=${getBase64EncodedUrl(fileUrl)}`;
 		const res = await fetch(apiUrl);
 		const json = await res.json();
-		return json.bounds as [number, number, number, number];
+		return (json.bounds ? json.bounds : [-180, -90, 180, 90]) as [number, number, number, number];
 	}
 
 	private async getVectorBounds(url: string) {
@@ -177,7 +180,12 @@ class BlobServiceAccountManager {
 		const res = await fetch(apiUrl);
 		const metadata = await res.json();
 		const bounds: string = metadata.bounds;
-		return bounds.split(',').map((b) => Number(b)) as [number, number, number, number];
+		return (bounds ? bounds.split(',').map((b) => Number(b)) : [-180, -90, 180, 90]) as [
+			number,
+			number,
+			number,
+			number
+		];
 	}
 }
 
