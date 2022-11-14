@@ -3,7 +3,8 @@ import { from as copyFrom } from 'pg-copy-streams';
 import wkx from 'wkx';
 import fs from 'fs';
 import path from 'path';
-import { Dataset, Tag } from '../interfaces';
+import { Dataset } from '../interfaces';
+import Tags from './Tags';
 
 class Datasets {
 	private datasets: Dataset[];
@@ -15,13 +16,26 @@ class Datasets {
 		this.datasets = datasets;
 	}
 
-	public getTags(): Tag[] {
-		const tags: Tag[][] = [];
-		this.datasets.forEach((d) => {
-			if (!d.tags) return;
-			tags.push(d.tags);
+	public addTags(tags: Tags) {
+		const masterTags = tags.getTags();
+		this.datasets.forEach((dataset) => {
+			dataset.tags?.forEach((x) => {
+				const tag = masterTags.find((y) => y.value === x.value && y.key === x.key);
+				if (!tag) {
+					tags.add(x);
+				}
+			});
 		});
-		return tags.flat();
+	}
+
+	public updateTags(tags: Tags) {
+		const masterTags = tags.getTags();
+		this.datasets.forEach((dataset) => {
+			dataset.tags?.forEach((x) => {
+				const tag = masterTags.find((y) => y.value === x.value && y.key === x.key);
+				x.id = tag?.id;
+			});
+		});
 	}
 
 	public async insertAll(client: PoolClient) {
@@ -34,6 +48,7 @@ class Datasets {
 		await this.clearAll(client, ids);
 
 		this.datasets = await this.bulkInsert(client, this.datasets);
+		await this.bulkInsertTabs(client, this.datasets);
 		return this.datasets;
 	}
 
@@ -65,6 +80,34 @@ class Datasets {
 				copyFrom(
 					'COPY geohub.dataset (id, storage_id, url, is_raster, source, license, bounds, createdat, updatedat) FROM STDIN'
 				)
+			);
+			const fileStream = fs.createReadStream(tsvFile);
+			fileStream.on('error', reject);
+			stream.on('error', reject);
+			stream.on('finish', () => {
+				resolve(datasets);
+			});
+			fileStream.pipe(stream);
+		});
+	}
+
+	private bulkInsertTabs(client: PoolClient, datasets: Dataset[]) {
+		const tsvFile = path.resolve(__dirname, `../../datasets_tags.tsv`);
+		if (fs.existsSync(tsvFile)) {
+			fs.unlinkSync(tsvFile);
+		}
+		datasets.forEach((dataset) => {
+			if (dataset.tags && dataset.tags.length > 0) {
+				dataset.tags.forEach((tag) => {
+					const values = [dataset.id, tag.id];
+					fs.appendFileSync(tsvFile, `${values.join('\t')}\n`);
+				});
+			}
+		});
+
+		return new Promise<Dataset[]>((resolve, reject) => {
+			const stream = client.query(
+				copyFrom('COPY geohub.dataset_tag (dataset_id, tag_id) FROM STDIN')
 			);
 			const fileStream = fs.createReadStream(tsvFile);
 			fileStream.on('error', reject);

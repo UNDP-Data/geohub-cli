@@ -14,22 +14,11 @@ class Tags {
 		this.tags = tags || [];
 	}
 
-	public addTags(tags: Tag[]) {
-		tags.forEach((x: Tag) => {
-			const tag = this.tags.find((y) => y.value === x.value && y.key === x.key);
-			if (!tag) {
-				this.tags.push(x);
-			}
-		});
-		return this.tags;
-	}
-
-	public updateTags(tags: Tag[]) {
-		tags.forEach((x: Tag) => {
-			const tag = this.tags.find((y) => y.value === x.value && y.key === x.key);
-			x.id = tag?.id;
-		});
-		return this.tags;
+	public add(tag: Tag) {
+		const res = this.tags.find((y) => y.value === tag.value && y.key === tag.key);
+		if (!res) {
+			this.tags.push(tag);
+		}
 	}
 
 	public async insert(client: PoolClient) {

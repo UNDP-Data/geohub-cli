@@ -4,6 +4,8 @@ import DatabaseManager from '../util/DatabaseManager';
 import Storages from '../util/Storages';
 import Datasets from '../util/Datasets';
 import Tags from '../util/Tags';
+import fs from 'fs';
+import path from 'path';
 
 const program = new Command();
 program
@@ -50,16 +52,15 @@ program
 		const tags: Tags = new Tags([]);
 
 		try {
-			tags.addTags(storages.getTags());
-			tags.addTags(datasets.getTags());
-
+			storages.addTags(tags);
+			datasets.addTags(tags);
 			const client = await dbManager.transactionStart();
 
 			await tags.insert(client);
 			console.debug(`${tags.getTags().length} tags were registered into PostGIS.`);
 
-			tags.updateTags(storages.getTags());
-			tags.updateTags(datasets.getTags());
+			storages.updateTags(tags);
+			datasets.updateTags(tags);
 
 			await storages.insertAll(client);
 			console.debug(`${storages.getStorages().length} storages were registered into PostGIS.`);
@@ -75,15 +76,15 @@ program
 		}
 
 		// for debug
-		// [
-		// 	{ file: 'tags.json', data: tags.getTags() },
-		// 	{ file: 'storages.json', data: storages.getStorages() },
-		// 	{ file: 'datasets.json', data: datasets.getDatasets() }
-		// ].forEach((data) => {
-		// 	const filePath = path.resolve(__dirname, `../../${data.file}`);
-		// 	fs.writeFileSync(filePath, JSON.stringify(data.data, null, 4));
-		// 	console.debug(`exported ${filePath}`);
-		// });
+		[
+			{ file: 'tags.json', data: tags.getTags() },
+			{ file: 'storages.json', data: storages.getStorages() },
+			{ file: 'datasets.json', data: datasets.getDatasets() }
+		].forEach((data) => {
+			const filePath = path.resolve(__dirname, `../../${data.file}`);
+			fs.writeFileSync(filePath, JSON.stringify(data.data, null, 4));
+			console.debug(`exported ${filePath}`);
+		});
 	});
 
 export default program;

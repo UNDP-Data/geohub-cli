@@ -1,4 +1,5 @@
 import {
+	BlobItem,
 	BlobServiceClient,
 	ContainerClient,
 	ServiceListContainersOptions,
@@ -92,46 +93,50 @@ class BlobServiceAccountManager {
 		return promises;
 	}
 
-	public async listBlobs(containerClient: ContainerClient, storage: Storage, path?: string) {
-		let promises: Promise<Dataset | undefined>[] = [];
-		for await (const item of containerClient.listBlobsByHierarchy('/', { prefix: path })) {
-			if (item.kind === 'prefix') {
-				// folder
-				const metadataJsonFileName = `${item.name}metadata.json`;
-				const bclient = containerClient.getBlobClient(metadataJsonFileName);
-				const isVectorTile: boolean = await bclient.exists();
-				if (isVectorTile) {
-					promises.push(this.createDataset(containerClient, storage, metadataJsonFileName));
-				} else {
-					const res = await this.listBlobs(containerClient, storage, item.name);
-					if (res.length === 0) continue;
-					promises = [...promises, ...res];
-				}
-			} else {
-				// blob
-				promises.push(this.createDataset(containerClient, storage, item.name));
-			}
+	public async listBlobs(containerClient: ContainerClient, storage: Storage) {
+		const promises: Promise<Dataset | undefined>[] = [];
+		for await (const blob of containerClient.listBlobsFlat()) {
+			promises.push(this.createDataset(containerClient, storage, blob));
 		}
+
+		// for await (const item of containerClient.listBlobsByHierarchy('/', { prefix: path })) {
+		// 	if (item.kind === 'prefix') {
+		// 		// folder
+		// 		const metadataJsonFileName = `${item.name}metadata.json`;
+		// 		const bclient = containerClient.getBlobClient(metadataJsonFileName);
+		// 		const isVectorTile: boolean = await bclient.exists();
+		// 		if (isVectorTile) {
+		// 			promises.push(this.createDataset(containerClient, storage, metadataJsonFileName));
+		// 		} else {
+		// 			const res = await this.listBlobs(containerClient, storage, item.name);
+		// 			if (res.length === 0) continue;
+		// 			promises = [...promises, ...res];
+		// 		}
+		// 	} else {
+		// 		// blob
+		// 		promises.push(this.createDataset(containerClient, storage, item.name));
+		// 	}
+		// }
 		return promises;
 	}
 
 	private async createDataset(
 		containerClient: ContainerClient,
 		storage: Storage,
-		itemName: string
+		blobItem: BlobItem
 	) {
 		let isRaster = false;
-		if (itemName.indexOf('metadata.json') === -1) {
+		if (blobItem.name.indexOf('metadata.json') === -1) {
 			// raster
-			if (isRasterExtension(itemName)) {
+			if (isRasterExtension(blobItem.name)) {
 				isRaster = true;
 			} else {
 				return;
 			}
 		}
-
-		const blockBlobClient = containerClient.getBlockBlobClient(itemName);
-		const result = await blockBlobClient.getTags();
+		// console.log(blobItem.tags, blobItem.properties.tagCount)
+		const blobClient = containerClient.getBlobClient(blobItem.name);
+		const result = await blobClient.getTags();
 		let tags: Tag[] = [];
 		for (const tag in result.tags) {
 			tags.push({
@@ -146,13 +151,12 @@ class BlobServiceAccountManager {
 			tags = [...tags, ...sdgTags];
 		}
 
-		const properties = await blockBlobClient.getProperties();
-		const bounds = isRaster
-			? await this.getRasterBounds(blockBlobClient.url)
-			: await this.getVectorBounds(blockBlobClient.url);
+		const url = `${this.baseUrl}/${storage.name}/${blobItem.name}`;
+		const properties = blobItem.properties;
+		const bounds = isRaster ? await this.getRasterBounds(url) : await this.getVectorBounds(url);
 		const dataset: Dataset = {
-			id: generateHashKey(blockBlobClient.url),
-			url: blockBlobClient.url,
+			id: generateHashKey(url),
+			url: url,
 			is_raster: isRaster,
 			bounds: bounds,
 			storage: storage,

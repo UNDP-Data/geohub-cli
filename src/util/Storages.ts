@@ -1,6 +1,7 @@
 import { PoolClient } from 'pg';
 import { concurrentPromise } from '../helpers';
-import { Storage, Tag } from '../interfaces';
+import { Storage } from '../interfaces';
+import Tags from './Tags';
 
 class Storages {
 	private storages: Storage[];
@@ -12,9 +13,26 @@ class Storages {
 		this.storages = storages;
 	}
 
-	public getTags(): Tag[] {
-		const tags = this.storages.map((s) => s.tags);
-		return tags.flat() || [];
+	public addTags(tags: Tags) {
+		const masterTags = tags.getTags();
+		this.storages.forEach((storage) => {
+			storage.tags.forEach((x) => {
+				const tag = masterTags.find((y) => y.value === x.value && y.key === x.key);
+				if (!tag) {
+					tags.add(x);
+				}
+			});
+		});
+	}
+
+	public updateTags(tags: Tags) {
+		const masterTags = tags.getTags();
+		this.storages.forEach((storage) => {
+			storage.tags.forEach((x) => {
+				const tag = masterTags.find((y) => y.value === x.value && y.key === x.key);
+				x.id = tag?.id;
+			});
+		});
 	}
 
 	public async insertAll(client: PoolClient) {
@@ -49,7 +67,7 @@ class Storages {
 		};
 		await client.query(query);
 
-		if (storage.tags.length === 0) {
+		if (storage.tags.length > 0) {
 			const sql = `
             INSERT INTO geohub.storage_tag (storage_id, tag_id) values ${storage.tags
 							.map((t) => `('${storage.id}', ${t.id})`)
