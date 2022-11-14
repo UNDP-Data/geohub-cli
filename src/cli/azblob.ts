@@ -29,10 +29,17 @@ program
 		);
 
 		const blobManager = new BlobServiceAccountManager(azaccount, azaccountkey);
-		const promises = containerNames.map((name) => blobManager.listContainers(name));
-		console.debug(`loaded ${promises.length} containers.`);
-		const _storages = await Promise.all(promises);
-		const storages = new Storages(_storages.flat());
+		let storages: Storages;
+		if (containerNames) {
+			const promises = containerNames.map((name) => blobManager.listContainers(name));
+			console.debug(`loaded ${promises.length} containers.`);
+			const _storages = await Promise.all(promises);
+			storages = new Storages(_storages.flat());
+		} else {
+			const _storages = await blobManager.listContainers();
+			storages = new Storages(_storages);
+		}
+
 		console.debug(`generated ${storages.getStorages().length} container objects`);
 		const _datasets = await blobManager.scanContainers(storages.getStorages());
 		const datasets = new Datasets(_datasets);
@@ -54,10 +61,10 @@ program
 			tags.updateTags(storages.getTags());
 			tags.updateTags(datasets.getTags());
 
-			await storages.insert(client);
+			await storages.insertAll(client);
 			console.debug(`${storages.getStorages().length} storages were registered into PostGIS.`);
 
-			await datasets.insert(client);
+			await datasets.insertAll(client);
 			console.debug(`${datasets.getDatasets().length} datasets were registered into PostGIS.`);
 		} catch (e) {
 			await dbManager.transactionRollback();

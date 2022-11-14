@@ -21,13 +21,13 @@ class Datasets {
 		return tags.flat();
 	}
 
-	public async insert(client: PoolClient) {
-		const promises = this.datasets.map((dataset) => this.insertDataset(client, dataset));
+	public async insertAll(client: PoolClient) {
+		const promises = this.datasets.map((dataset) => this.insert(client, dataset));
 		this.datasets = await concurrentPromise(promises, 10);
 		return this.datasets;
 	}
 
-	private async insertDataset(client: PoolClient, dataset: Dataset) {
+	public async insert(client: PoolClient, dataset: Dataset) {
 		const wkt = `POLYGON((${dataset.bounds[0]} ${dataset.bounds[1]},${dataset.bounds[2]} ${dataset.bounds[1]},
 			${dataset.bounds[2]} ${dataset.bounds[3]},${dataset.bounds[0]} ${dataset.bounds[3]},${dataset.bounds[0]} ${dataset.bounds[1]}))`;
 		let query = {

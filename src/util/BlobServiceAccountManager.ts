@@ -9,6 +9,7 @@ import {
 } from '@azure/storage-blob';
 import type { ContainerMetadata, Dataset, Storage, Tag } from '../interfaces';
 import {
+	concurrentPromise,
 	generateHashKey,
 	generateSasToken,
 	getBase64EncodedUrl,
@@ -75,13 +76,17 @@ class BlobServiceAccountManager {
 	}
 
 	public async scanContainers(storages: Storage[]) {
-		let result: Dataset[] = [];
-		for (const storage of storages) {
-			const containerClient = this.blobServiceClient.getContainerClient(storage.name);
-			const datasets = await this.listBlobs(containerClient, storage);
-			result = [...result, ...datasets];
-		}
-		return result;
+		const promises = storages.map((storage) => this.scanContainer(storage));
+		const result = await concurrentPromise(promises, 5);
+		return result.flat();
+	}
+
+	public async scanContainer(storage: Storage) {
+		console.debug(`${storage.name} started scanning`);
+		const containerClient = this.blobServiceClient.getContainerClient(storage.name);
+		const datasets = await this.listBlobs(containerClient, storage);
+		console.debug(`${storage.name} ended scanning ${datasets.length} datasets`);
+		return datasets;
 	}
 
 	public async listBlobs(containerClient: ContainerClient, storage: Storage, path?: string) {
