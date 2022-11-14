@@ -29,6 +29,10 @@ COMMENT ON COLUMN geohub.dataset.license IS 'data license';
 
 COMMENT ON COLUMN geohub.dataset.bounds IS 'bounds of data';
 
+CREATE INDEX IF NOT EXISTS dataset_bounds_geom_idx
+    ON geohub.dataset USING gist
+    (bounds)
+
 CREATE TABLE geohub.dataset_tag
 (
   dataset_id character varying NOT NULL,

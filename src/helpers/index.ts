@@ -1,3 +1,4 @@
+export * from './concurrentPromise';
 export * from './generateHashKey';
 export * from './generateSasToken';
 export * from './getBase64EncodedUrl';
