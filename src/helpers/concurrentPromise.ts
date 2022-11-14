@@ -1,3 +1,5 @@
+// import sleep from 'sleep'
+
 export const concurrentPromise = async <T>(
 	promises: Promise<T>[],
 	concurrency: number
@@ -13,6 +15,7 @@ export const concurrentPromise = async <T>(
 		}
 		Array.prototype.push.apply(results, await Promise.all(chunks));
 		currentIndex += concurrency;
+		// sleep.msleep(1000)
 	}
 	return results;
 };

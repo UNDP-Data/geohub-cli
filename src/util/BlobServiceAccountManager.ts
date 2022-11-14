@@ -13,6 +13,7 @@ import {
 	getBase64EncodedUrl,
 	isRasterExtension
 } from '../helpers';
+// import sleep from 'sleep'
 
 class BlobServiceAccountManager {
 	private azAccount: string;
@@ -73,12 +74,16 @@ class BlobServiceAccountManager {
 		return storages;
 	}
 
-	public async scanContainers(storages: Storage[]) {
+	public async scanContainers(storages: Storage[]): Promise<Dataset[]> {
 		const datasets: Dataset[] = [];
 		for (const storage of storages) {
 			const promises = await this.scanContainer(storage);
 			console.debug(`${promises.length} datasets start loading`);
-			const result = await concurrentPromise(promises, 50);
+			// for await (const dataset of promises) {
+			// 	if (!dataset) continue
+			// 	datasets.push(dataset)
+			// }
+			const result = await concurrentPromise(promises, 10);
 			Array.prototype.push.apply(datasets, result);
 			console.debug(`${promises.length} datasets ended loading`);
 		}
@@ -98,25 +103,6 @@ class BlobServiceAccountManager {
 		for await (const blob of containerClient.listBlobsFlat()) {
 			promises.push(this.createDataset(containerClient, storage, blob));
 		}
-
-		// for await (const item of containerClient.listBlobsByHierarchy('/', { prefix: path })) {
-		// 	if (item.kind === 'prefix') {
-		// 		// folder
-		// 		const metadataJsonFileName = `${item.name}metadata.json`;
-		// 		const bclient = containerClient.getBlobClient(metadataJsonFileName);
-		// 		const isVectorTile: boolean = await bclient.exists();
-		// 		if (isVectorTile) {
-		// 			promises.push(this.createDataset(containerClient, storage, metadataJsonFileName));
-		// 		} else {
-		// 			const res = await this.listBlobs(containerClient, storage, item.name);
-		// 			if (res.length === 0) continue;
-		// 			promises = [...promises, ...res];
-		// 		}
-		// 	} else {
-		// 		// blob
-		// 		promises.push(this.createDataset(containerClient, storage, item.name));
-		// 	}
-		// }
 		return promises;
 	}
 
@@ -134,15 +120,18 @@ class BlobServiceAccountManager {
 				return;
 			}
 		}
-		// console.log(blobItem.tags, blobItem.properties.tagCount)
-		const blobClient = containerClient.getBlobClient(blobItem.name);
-		const result = await blobClient.getTags();
+
 		let tags: Tag[] = [];
-		for (const tag in result.tags) {
-			tags.push({
-				key: tag,
-				value: result.tags[tag]
-			});
+		const tagCount = blobItem.properties.tagCount;
+		if (tagCount && tagCount > 0) {
+			const blobClient = containerClient.getBlobClient(blobItem.name);
+			const result = await blobClient.getTags();
+			for (const tag in result.tags) {
+				tags.push({
+					key: tag,
+					value: result.tags[tag]
+				});
+			}
 		}
 
 		const strageTags = storage.tags;
