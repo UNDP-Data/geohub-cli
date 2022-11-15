@@ -18,6 +18,11 @@ program
 		'-n, --name [container_name...]',
 		'Targeted Azure Blob Container name to scan. It will scan all containers if it is not specified.'
 	)
+	.option(
+		'-o, --output [output]',
+		'Output directory for temporary working folder. Default is tmp folder',
+		'tmp'
+	)
 	.action(async () => {
 		console.time('azblob');
 		const options = program.opts();
@@ -25,6 +30,10 @@ program
 		const azaccount: string = options.azaccount;
 		const azaccountkey: string = options.azaccountkey;
 		const containerNames: string[] = options.name;
+		const outputDir: string = path.resolve(options.output);
+		if (!fs.existsSync(outputDir)) {
+			fs.mkdirSync(outputDir);
+		}
 
 		console.debug(
 			`loaded parameters: ${JSON.stringify({ database, azaccount, azaccountkey, containerNames })}`
@@ -44,7 +53,7 @@ program
 
 		console.debug(`generated ${storages.getStorages().length} container objects`);
 		const _datasets = await blobManager.scanContainers(storages.getStorages());
-		const datasets = new Datasets(_datasets);
+		const datasets = new Datasets(_datasets, outputDir);
 		console.debug(`generated ${datasets.getDatasets().length} dataset objects`);
 
 		const dbManager = new DatabaseManager(database);
@@ -81,7 +90,7 @@ program
 			{ file: 'storages.json', data: storages.getStorages() },
 			{ file: 'datasets.json', data: datasets.getDatasets() }
 		].forEach((data) => {
-			const filePath = path.resolve(__dirname, `../../${data.file}`);
+			const filePath = path.resolve(outputDir, data.file);
 			fs.writeFileSync(filePath, JSON.stringify(data.data, null, 4));
 			console.debug(`exported ${filePath}`);
 		});

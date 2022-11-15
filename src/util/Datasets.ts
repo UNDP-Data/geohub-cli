@@ -12,8 +12,11 @@ class Datasets {
 		return this.datasets;
 	}
 
-	constructor(datasets: Dataset[]) {
+	private tmpDir: string;
+
+	constructor(datasets: Dataset[], tmpDir: string) {
 		this.datasets = datasets;
+		this.tmpDir = tmpDir;
 	}
 
 	public addTags(tags: Tags) {
@@ -53,7 +56,7 @@ class Datasets {
 	}
 
 	private bulkInsert(client: PoolClient, datasets: Dataset[]) {
-		const tsvFile = path.resolve(__dirname, `../../datasets.tsv`);
+		const tsvFile = path.resolve(this.tmpDir, `datasets.tsv`);
 		if (fs.existsSync(tsvFile)) {
 			fs.unlinkSync(tsvFile);
 		}
@@ -92,7 +95,7 @@ class Datasets {
 	}
 
 	private bulkInsertTabs(client: PoolClient, datasets: Dataset[]) {
-		const tsvFile = path.resolve(__dirname, `../../datasets_tags.tsv`);
+		const tsvFile = path.resolve(this.tmpDir, `atasets_tags.tsv`);
 		if (fs.existsSync(tsvFile)) {
 			fs.unlinkSync(tsvFile);
 		}
