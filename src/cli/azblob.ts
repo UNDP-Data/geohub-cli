@@ -1,9 +1,5 @@
 import { Command } from 'commander';
-import BlobServiceAccountManager from '../util/BlobServiceAccountManager';
-import DatabaseManager from '../util/DatabaseManager';
-import Storages from '../util/Storages';
-import Datasets from '../util/Datasets';
-import Tags from '../util/Tags';
+import { BlobServiceAccountManager, DatabaseManager, Storages, Datasets, Tags } from '../util';
 import fs from 'fs';
 import path from 'path';
 

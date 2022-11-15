@@ -2,11 +2,13 @@
 	"name": "geohub-cli",
 	"version": "1.0.0",
 	"description": "This repository is to manage CLI tools for GeoHub",
+	"main": "dist/index.js",
+	"types": "dist/index.d.ts",
 	"bin": {
-		"geohub": "dist/index.js"
+		"geohub": "dist/cli/index.js"
 	},
 	"scripts": {
-		"dev": "./node_modules/.bin/ts-node ./src/index.ts",
+		"dev": "./node_modules/.bin/ts-node ./src/cli/index.ts",
 		"build": "rimraf dist && tsc -p .",
 		"watch": "tsc -w",
 		"lint": "prettier --plugin-search-dir . --check . && eslint .",
@@ -14,8 +16,12 @@
 		"prepare": "pnpm build && lefthook install",
 		"preinstall": "npx only-allow pnpm"
 	},
-	"keywords": [],
-	"author": "",
+	"keywords": [
+		"geohub",
+		"undp",
+		"postgis"
+	],
+	"author": "United Nations Development Programme",
 	"license": "ISC",
 	"devDependencies": {
 		"@types/cli-progress": "^3.11.0",
@@ -39,7 +45,6 @@
 		"crypto": "^1.0.1",
 		"pg": "^8.8.0",
 		"pg-copy-streams": "^6.0.4",
-		"sleep": "^6.3.0",
 		"wkx": "^0.5.0"
 	}
 }

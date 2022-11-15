@@ -11,7 +11,6 @@ import {
 	getBase64EncodedUrl,
 	isRasterExtension
 } from '../helpers';
-// import sleep from 'sleep'
 
 class BlobServiceAccountManager {
 	private azAccount: string;
