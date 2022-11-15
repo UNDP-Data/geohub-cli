@@ -1,5 +1,4 @@
 import {
-	BlobItem,
 	BlobServiceClient,
 	ContainerClient,
 	ServiceListContainersOptions,
@@ -7,13 +6,11 @@ import {
 } from '@azure/storage-blob';
 import type { ContainerMetadata, Dataset, Storage, Tag } from '../interfaces';
 import {
-	concurrentPromise,
 	generateHashKey,
 	generateSasToken,
 	getBase64EncodedUrl,
 	isRasterExtension
 } from '../helpers';
-// import sleep from 'sleep'
 
 class BlobServiceAccountManager {
 	private azAccount: string;
@@ -77,15 +74,8 @@ class BlobServiceAccountManager {
 	public async scanContainers(storages: Storage[]): Promise<Dataset[]> {
 		const datasets: Dataset[] = [];
 		for (const storage of storages) {
-			const promises = await this.scanContainer(storage);
-			console.debug(`${promises.length} datasets start loading`);
-			// for await (const dataset of promises) {
-			// 	if (!dataset) continue
-			// 	datasets.push(dataset)
-			// }
-			const result = await concurrentPromise(promises, 10);
-			Array.prototype.push.apply(datasets, result);
-			console.debug(`${promises.length} datasets ended loading`);
+			const results = await this.scanContainer(storage);
+			Array.prototype.push.apply(datasets, results);
 		}
 		return datasets;
 	}
@@ -93,45 +83,61 @@ class BlobServiceAccountManager {
 	public async scanContainer(storage: Storage) {
 		console.debug(`${storage.name} started scanning`);
 		const containerClient = this.blobServiceClient.getContainerClient(storage.name);
-		const promises = await this.listBlobs(containerClient, storage);
-		console.debug(`${storage.name} ended scanning ${promises.length} datasets`);
-		return promises;
+		const datasets = await this.listBlobs(containerClient, storage);
+		console.debug(`${storage.name} ended scanning ${datasets.length} datasets`);
+		return datasets;
 	}
 
-	public async listBlobs(containerClient: ContainerClient, storage: Storage) {
-		const promises: Promise<Dataset | undefined>[] = [];
-		for await (const blob of containerClient.listBlobsFlat()) {
-			promises.push(this.createDataset(containerClient, storage, blob));
+	public async listBlobs(containerClient: ContainerClient, storage: Storage, path?: string) {
+		let datasets: Dataset[] = [];
+		for await (const item of containerClient.listBlobsByHierarchy('/', { prefix: path })) {
+			if (item.kind === 'prefix') {
+				// folder
+				const metadataJsonFileName = `${item.name}metadata.json`;
+				const bclient = containerClient.getBlobClient(metadataJsonFileName);
+				const isVectorTile: boolean = await bclient.exists();
+				if (isVectorTile) {
+					const dataset = await this.createDataset(containerClient, storage, metadataJsonFileName);
+					if (!dataset) continue;
+					datasets.push(dataset);
+				} else {
+					const dataset = await this.listBlobs(containerClient, storage, item.name);
+					if (dataset.length === 0) continue;
+					datasets = [...datasets, ...dataset];
+				}
+			} else {
+				// blob
+				const dataset = await this.createDataset(containerClient, storage, item.name);
+				if (!dataset) continue;
+				datasets.push(dataset);
+			}
 		}
-		return promises;
+		return datasets;
 	}
 
 	private async createDataset(
 		containerClient: ContainerClient,
 		storage: Storage,
-		blobItem: BlobItem
+		itemName: string
 	) {
 		let isRaster = false;
-		if (blobItem.name.indexOf('metadata.json') === -1) {
+		if (itemName.indexOf('metadata.json') === -1) {
 			// raster
-			if (isRasterExtension(blobItem.name)) {
+			if (isRasterExtension(itemName)) {
 				isRaster = true;
 			} else {
 				return;
 			}
 		}
 
+		const blockBlobClient = containerClient.getBlockBlobClient(itemName);
+		const result = await blockBlobClient.getTags();
 		let tags: Tag[] = [];
-		const tagCount = blobItem.properties.tagCount;
-		if (tagCount && tagCount > 0) {
-			const blobClient = containerClient.getBlobClient(blobItem.name);
-			const result = await blobClient.getTags();
-			for (const tag in result.tags) {
-				tags.push({
-					key: tag,
-					value: result.tags[tag]
-				});
-			}
+		for (const tag in result.tags) {
+			tags.push({
+				key: tag,
+				value: result.tags[tag]
+			});
 		}
 
 		const strageTags = storage.tags;
@@ -140,8 +146,8 @@ class BlobServiceAccountManager {
 			tags = [...tags, ...sdgTags];
 		}
 
-		const url = `${this.baseUrl}/${storage.name}/${blobItem.name}`;
-		const properties = blobItem.properties;
+		const url = blockBlobClient.url;
+		const properties = await blockBlobClient.getProperties();
 		const bounds = isRaster ? await this.getRasterBounds(url) : await this.getVectorBounds(url);
 		const dataset: Dataset = {
 			id: generateHashKey(url),

@@ -1,7 +1,7 @@
 {
 	"compilerOptions": {
 		"target": "esnext",
-		"declaration": false,
+		"declaration": true,
 		"declarationMap": false,
 		"sourceMap": false,
 		"strict": true,
@@ -15,5 +15,5 @@
 		"module": "commonjs",
 		"outDir": "./dist"
 	},
-	"include": ["src/index.ts"]
+	"include": ["src/index.ts", "src/cli/index.ts"]
 }
