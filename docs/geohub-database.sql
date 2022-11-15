@@ -4,6 +4,8 @@ CREATE TABLE geohub.dataset
   id         character varying        NOT NULL,
   storage_id character varying        NOT NULL,
   url        character varying        NOT NULL,
+  name       character varying        NOT NULL,
+  description     character varying       ,
   is_raster  boolean                  NOT NULL,
   source     character varying       ,
   license    character varying       ,
@@ -36,7 +38,8 @@ CREATE INDEX IF NOT EXISTS dataset_bounds_geom_idx
 CREATE TABLE geohub.dataset_tag
 (
   dataset_id character varying NOT NULL,
-  tag_id     serial            NOT NULL
+  tag_id     serial            NOT NULL,
+  CONSTRAINT dataset_tag_pkey PRIMARY KEY (dataset_id, tag_id)
 );
 
 COMMENT ON TABLE geohub.dataset_tag IS 'this table connects file_metadata and tag tables';
@@ -69,7 +72,8 @@ COMMENT ON COLUMN geohub.storage.icon IS 'fontawesome icon name or icon URL';
 CREATE TABLE geohub.storage_tag
 (
   storage_id character varying NOT NULL,
-  tag_id     serial            NOT NULL
+  tag_id     serial            NOT NULL,
+  CONSTRAINT storage_tag_pkey PRIMARY KEY (storage_id, tag_id)
 );
 
 COMMENT ON TABLE geohub.storage_tag IS 'this table connects between storage and tag';
@@ -129,3 +133,18 @@ ALTER TABLE geohub.storage_tag
   ADD CONSTRAINT FK_storage_TO_storage_tag
     FOREIGN KEY (storage_id)
     REFERENCES geohub.storage (id);
+
+-- DROP INDEX IF EXISTS geohub.tag_idx_key_value;
+
+CREATE INDEX IF NOT EXISTS tag_idx_key_value
+    ON geohub.tag USING btree
+    (key COLLATE pg_catalog."default" ASC NULLS LAST, value COLLATE pg_catalog."default" ASC NULLS LAST)
+    TABLESPACE pg_default;
+-- Index: tag_idx_value
+
+-- DROP INDEX IF EXISTS geohub.tag_idx_value;
+
+CREATE INDEX IF NOT EXISTS tag_idx_value
+    ON geohub.tag USING btree
+    (value COLLATE pg_catalog."default" ASC NULLS LAST)
+    TABLESPACE pg_default;

@@ -5,6 +5,7 @@ import fs from 'fs';
 import path from 'path';
 import { Dataset } from '../interfaces';
 import Tags from './Tags';
+import { cleanText } from '../helpers';
 
 class Datasets {
 	private datasets: Dataset[];
@@ -68,9 +69,11 @@ class Datasets {
 				dataset.id,
 				dataset.storage.id,
 				dataset.url,
+				dataset.name,
+				cleanText(dataset.description),
 				dataset.is_raster,
-				dataset.source || '',
-				dataset.license || '',
+				cleanText(dataset.source),
+				cleanText(dataset.license),
 				Buffer.from(geometry.toWkb()).toString('hex'),
 				dataset.createdat,
 				dataset.updatedat
@@ -81,7 +84,7 @@ class Datasets {
 		return new Promise<Dataset[]>((resolve, reject) => {
 			const stream = client.query(
 				copyFrom(
-					'COPY geohub.dataset (id, storage_id, url, is_raster, source, license, bounds, createdat, updatedat) FROM STDIN'
+					'COPY geohub.dataset (id, storage_id, url, name, description, is_raster, source, license, bounds, createdat, updatedat ) FROM STDIN'
 				)
 			);
 			const fileStream = fs.createReadStream(tsvFile);
@@ -152,15 +155,17 @@ class Datasets {
 			${dataset.bounds[2]} ${dataset.bounds[3]},${dataset.bounds[0]} ${dataset.bounds[3]},${dataset.bounds[0]} ${dataset.bounds[1]}))`;
 		const query = {
 			text: `
-			INSERT INTO geohub.dataset (id, storage_id, url, is_raster, source, license, bounds, createdat, updatedat) 
-			values ($1, $2, $3, $4, $5, $6, ST_GeomFROMTEXT('${wkt}', 4326), $7::timestamptz, $8::timestamptz)`,
+			INSERT INTO geohub.dataset (id, storage_id, url, name, description, is_raster, source, license, bounds, createdat, updatedat) 
+			values ($1, $2, $3, $4, $5, $6, $7, $8, ST_GeomFROMTEXT('${wkt}', 4326), $9::timestamptz, $9::timestamptz)`,
 			values: [
 				dataset.id,
 				dataset.storage.id,
 				dataset.url,
+				dataset.name,
+				cleanText(dataset.description),
 				dataset.is_raster,
-				dataset.source,
-				dataset.license,
+				cleanText(dataset.source),
+				cleanText(dataset.license),
 				dataset.createdat,
 				dataset.updatedat
 			]

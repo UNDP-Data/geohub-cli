@@ -5,6 +5,8 @@ export interface Dataset {
 	id: string;
 	url: string;
 	is_raster: boolean;
+	name: string;
+	description?: string;
 	source?: string;
 	license?: string;
 	bounds: [number, number, number, number];

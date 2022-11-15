@@ -1,3 +1,4 @@
+export * from './cleanText';
 export * from './concurrentPromise';
 export * from './generateHashKey';
 export * from './generateSasToken';

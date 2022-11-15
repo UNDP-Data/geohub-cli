@@ -4,7 +4,14 @@ import {
 	ServiceListContainersOptions,
 	StorageSharedKeyCredential
 } from '@azure/storage-blob';
-import type { ContainerMetadata, Dataset, Storage, Tag } from '../interfaces';
+import type {
+	BandMetadata,
+	ContainerMetadata,
+	Dataset,
+	RasterTileMetadata,
+	Storage,
+	Tag
+} from '../interfaces';
 import {
 	generateHashKey,
 	generateSasToken,
@@ -148,12 +155,18 @@ class BlobServiceAccountManager {
 
 		const url = blockBlobClient.url;
 		const properties = await blockBlobClient.getProperties();
-		const bounds = isRaster ? await this.getRasterBounds(url) : await this.getVectorBounds(url);
+		const metadata = isRaster
+			? await this.getRasterMetadata(url)
+			: await this.getVectorMetadata(url);
+		const urlObj = new URL(url).pathname.replace('/metadata.json', '').split('/');
 		const dataset: Dataset = {
 			id: generateHashKey(url),
 			url: url,
+			name: urlObj.pop() || '',
 			is_raster: isRaster,
-			bounds: bounds,
+			description: metadata.description,
+			bounds: metadata.bounds,
+			source: metadata.source,
 			storage: storage,
 			tags: tags,
 			createdat: properties.createdOn ? properties.createdOn.toISOString() : '',
@@ -162,25 +175,52 @@ class BlobServiceAccountManager {
 		return dataset;
 	}
 
-	private async getRasterBounds(url: string) {
+	private async getRasterMetadata(url: string) {
 		const fileUrl = `${url}${this.sasToken}`;
-		const apiUrl = `https://titiler.undpgeohub.org/cog/bounds?url=${getBase64EncodedUrl(fileUrl)}`;
+		const apiUrl = `https://titiler.undpgeohub.org/cog/info?url=${getBase64EncodedUrl(fileUrl)}`;
 		const res = await fetch(apiUrl);
-		const json = await res.json();
-		return (json.bounds ? json.bounds : [-180, -90, 180, 90]) as [number, number, number, number];
+		const json: RasterTileMetadata = await res.json();
+		const band_metadata = json.band_metadata;
+		let description: string | undefined;
+		let source: string | undefined;
+		band_metadata?.forEach((band) => {
+			band.forEach((data: string | BandMetadata) => {
+				if (data instanceof String) return;
+				const metadata = data as BandMetadata;
+				description = metadata.Description;
+				source = metadata.Source;
+			});
+		});
+
+		return {
+			bounds: (json.bounds ? json.bounds : [-180, -90, 180, 90]) as [
+				number,
+				number,
+				number,
+				number
+			],
+			description: description,
+			source: source
+		};
 	}
 
-	private async getVectorBounds(url: string) {
+	private async getVectorMetadata(url: string) {
 		const apiUrl = `${url}${this.sasToken}`;
 		const res = await fetch(apiUrl);
 		const metadata = await res.json();
 		const bounds: string = metadata.bounds;
-		return (bounds ? bounds.split(',').map((b) => Number(b)) : [-180, -90, 180, 90]) as [
-			number,
-			number,
-			number,
-			number
-		];
+		const description: string | undefined = metadata.description;
+		const source: string | undefined = metadata.attribution;
+		return {
+			bounds: (bounds ? bounds.split(',').map((b) => Number(b)) : [-180, -90, 180, 90]) as [
+				number,
+				number,
+				number,
+				number
+			],
+			description,
+			source
+		};
 	}
 }
 
