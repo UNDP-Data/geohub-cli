@@ -1,3 +1,4 @@
+export * from './cleanName';
 export * from './cleanText';
 export * from './concurrentPromise';
 export * from './generateHashKey';

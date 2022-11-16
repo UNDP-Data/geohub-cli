@@ -1,6 +1,7 @@
 *.json
 *.tsv
 tmp/
+.DS_Store
 
 # Logs
 logs

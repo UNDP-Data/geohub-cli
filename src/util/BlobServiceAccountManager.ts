@@ -13,6 +13,7 @@ import type {
 	Tag
 } from '../interfaces';
 import {
+	cleanName,
 	generateHashKey,
 	generateSasToken,
 	getBase64EncodedUrl,
@@ -162,7 +163,7 @@ class BlobServiceAccountManager {
 		const dataset: Dataset = {
 			id: generateHashKey(url),
 			url: url,
-			name: urlObj.pop() || '',
+			name: cleanName(urlObj.pop()),
 			is_raster: isRaster,
 			description: metadata.description,
 			bounds: metadata.bounds,
