@@ -72,6 +72,19 @@ class Tags {
 		});
 		return tags;
 	}
+
+	public async cleanup(client: PoolClient) {
+		const query = {
+			text: `
+			DELETE FROM geohub.tag x
+			WHERE
+			(NOT EXISTS (SELECT tag_id FROM geohub.dataset_tag WHERE tag_id = x.id))
+			and
+			(NOT EXISTS (SELECT tag_id FROM geohub.storage_tag WHERE tag_id = x.id))
+			`
+		};
+		await client.query(query);
+	}
 }
 
 export default Tags;

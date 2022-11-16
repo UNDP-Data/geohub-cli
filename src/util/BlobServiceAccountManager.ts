@@ -140,18 +140,34 @@ class BlobServiceAccountManager {
 
 		const blockBlobClient = containerClient.getBlockBlobClient(itemName);
 		const result = await blockBlobClient.getTags();
-		let tags: Tag[] = [];
+		const tags: Tag[] = [];
 		for (const tag in result.tags) {
-			tags.push({
-				key: tag,
-				value: result.tags[tag]
-			});
-		}
-
-		const strageTags = storage.tags;
-		const sdgTags = strageTags.filter((t) => t.key && t.key === 'sdg');
-		if (sdgTags.length > 0) {
-			tags = [...tags, ...sdgTags];
+			// skip name tag to register
+			if (['name1', 'name2', 'name3'].includes(tag.toLowerCase())) continue;
+			if (result.tags[tag] && result.tags[tag] === 'nan') continue;
+			if (tag === 'sdg_goal') {
+				try {
+					const value = parseInt(result.tags[tag]);
+					tags.push({
+						key: tag,
+						value: value.toString()
+					});
+				} catch {
+					const values = result.tags[tag].split(' ');
+					values.forEach((value) => {
+						tags.push({
+							key: tag,
+							value: value
+						});
+					});
+					console.log(JSON.stringify(tags));
+				}
+			} else {
+				tags.push({
+					key: tag,
+					value: result.tags[tag]
+				});
+			}
 		}
 
 		const url = blockBlobClient.url;

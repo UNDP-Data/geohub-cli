@@ -72,6 +72,9 @@ program
 
 			await datasets.insertAll(client);
 			console.debug(`${datasets.getDatasets().length} datasets were registered into PostGIS.`);
+
+			await tags.cleanup(client);
+			console.debug(`unused tags were cleaned`);
 		} catch (e) {
 			await dbManager.transactionRollback();
 			throw e;
