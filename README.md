@@ -17,6 +17,8 @@ Commands:
   help [command]    display help for command
 ```
 
+- Register Azure Blob Containers
+
 ```shell
 $geohub azblob -h
 Usage: geohub azblob [options]
@@ -34,6 +36,36 @@ Options:
 ```
 
 it takes approximately 23 minutes to finish importing all Azure blob containers (20 NO) of geohub.
+
+- Register martin layers
+
+```shell
+$geohub martin -h
+Usage: geohub martin [options]
+
+scan martin layers to register metadata into PostgreSQL database.
+
+Options:
+  -d, --database <dsn>           PostgreSQL database connection string
+  -m, --martin-url [martin-url]  URL for martin index.json (default: "https://martin.undpgeohub.org/index.json")
+  -o, --output [output]          Output directory for temporary working folder (default: "tmp")
+  -h, --help                     display help for command
+```
+
+- Register pg_tilesrev layers
+
+```shell
+$geohub pgtileserv -h
+Usage: geohub pgtileserv [options]
+
+scan pg_tileserv layers to register metadata into PostgreSQL database.
+
+Options:
+  -d, --database <dsn>                   PostgreSQL database connection string
+  -p, --pgtileserv-url [pgtileserv-url]  URL for pg_tileserv index.json (default: "https://pgtileserv.undpgeohub.org/index.json")
+  -o, --output [output]                  Output directory for temporary working folder (default: "tmp")
+  -h, --help                             display help for command
+```
 
 ## ER diagram
 
