@@ -5,6 +5,7 @@ import Storages from './Storages';
 import Tags from './Tags';
 import MartinManager from './MartinManager';
 import PgtileservManager from './PgtileservManager';
+import StacManager from './StacManager';
 
 export {
 	BlobServiceAccountManager,
@@ -13,5 +14,6 @@ export {
 	Storages,
 	Tags,
 	MartinManager,
-	PgtileservManager
+	PgtileservManager,
+	StacManager
 };

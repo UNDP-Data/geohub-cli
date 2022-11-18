@@ -1,5 +1,5 @@
 {
-	"name": "geohub-cli",
+	"name": "@undp-data/geohub-cli",
 	"version": "1.0.0",
 	"description": "This repository is to manage CLI tools for GeoHub",
 	"main": "dist/index.js",
@@ -46,5 +46,10 @@
 		"pg": "^8.8.0",
 		"pg-copy-streams": "^6.0.4",
 		"wkx": "^0.5.0"
-	}
+	},
+	"packageManager": "pnpm@7.13.5",
+	"engines": {
+		"pnpm": "^7.0.0"
+	},
+	"type": "module"
 }
