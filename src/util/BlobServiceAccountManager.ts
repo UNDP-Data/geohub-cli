@@ -180,7 +180,7 @@ class BlobServiceAccountManager {
 		const urlObj = new URL(url).pathname.replace('/metadata.json', '').split('/');
 		const dataset: Dataset = {
 			id: generateHashKey(url),
-			url: url,
+			url: isRaster ? url : url.replace('/metadata.json', '/{z}/{x}/{y}.pbf'),
 			name: cleanName(urlObj.pop()),
 			is_raster: isRaster,
 			description: metadata.description,

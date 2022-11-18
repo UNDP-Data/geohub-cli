@@ -1,4 +1,7 @@
 import { Pool, PoolClient } from 'pg';
+import Datasets from './Datasets';
+import Storages from './Storages';
+import Tags from './Tags';
 
 class DatabaseManager {
 	private connectionString: string;
@@ -27,6 +30,36 @@ class DatabaseManager {
 		console.info('Transaction ended');
 		this.client?.release();
 		this.pool?.end();
+	}
+
+	public async registerAll(storages: Storages, datasets: Datasets) {
+		const tags: Tags = new Tags([]);
+
+		try {
+			storages.addTags(tags);
+			datasets.addTags(tags);
+			const client = await this.transactionStart();
+
+			await tags.insert(client);
+			console.debug(`${tags.getTags().length} tags were registered into PostGIS.`);
+
+			storages.updateTags(tags);
+			datasets.updateTags(tags);
+
+			await storages.insertAll(client);
+			console.debug(`${storages.getStorages().length} storages were registered into PostGIS.`);
+
+			await datasets.insertAll(client);
+			console.debug(`${datasets.getDatasets().length} datasets were registered into PostGIS.`);
+
+			await tags.cleanup(client);
+			console.debug(`unused tags were cleaned`);
+		} catch (e) {
+			await this.transactionRollback();
+			throw e;
+		} finally {
+			await this.transactionEnd();
+		}
 	}
 }
 
