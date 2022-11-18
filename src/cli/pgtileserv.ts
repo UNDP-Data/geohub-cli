@@ -1,7 +1,7 @@
 import { Command } from 'commander';
 import fs from 'fs';
 import path from 'path';
-import { DatabaseManager, Datasets, PgtileservManager, Storages, Tags } from '../util';
+import { DatabaseManager, Datasets, PgtileservManager, Storages } from '../util';
 
 const program = new Command();
 program
@@ -15,7 +15,7 @@ program
 	)
 	.option('-o, --output [output]', 'Output directory for temporary working folder', 'tmp')
 	.action(async () => {
-		console.time('azblob');
+		console.time('pgtileserv');
 		const options = program.opts();
 		const database: string = options.database;
 		const pgtileservUrl: string = options.pgtileservUrl;
@@ -23,8 +23,6 @@ program
 		if (!fs.existsSync(outputDir)) {
 			fs.mkdirSync(outputDir);
 		}
-
-		console.debug(`loaded parameters: ${JSON.stringify({ database, pgtileservUrl })}`);
 
 		const pgtileservManager = new PgtileservManager(pgtileservUrl);
 		const data = await pgtileservManager.load();
@@ -35,35 +33,9 @@ program
 		console.log(`${datasets.getDatasets().length} dataset object were created`);
 
 		const dbManager = new DatabaseManager(database);
-		console.debug(`database manager was generated.`);
-		const tags: Tags = new Tags([]);
+		await dbManager.registerAll(storages, datasets);
 
-		try {
-			storages.addTags(tags);
-			datasets.addTags(tags);
-			const client = await dbManager.transactionStart();
-
-			await tags.insert(client);
-			console.debug(`${tags.getTags().length} tags were registered into PostGIS.`);
-
-			storages.updateTags(tags);
-			datasets.updateTags(tags);
-
-			await storages.insertAll(client);
-			console.debug(`${storages.getStorages().length} storages were registered into PostGIS.`);
-
-			await datasets.insertAll(client);
-			console.debug(`${datasets.getDatasets().length} datasets were registered into PostGIS.`);
-
-			await tags.cleanup(client);
-			console.debug(`unused tags were cleaned`);
-		} catch (e) {
-			await dbManager.transactionRollback();
-			throw e;
-		} finally {
-			await dbManager.transactionEnd();
-			console.timeEnd('azblob');
-		}
+		console.timeEnd('pgtileserv');
 	});
 
 export default program;

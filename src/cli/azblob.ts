@@ -1,5 +1,5 @@
 import { Command } from 'commander';
-import { BlobServiceAccountManager, DatabaseManager, Storages, Datasets, Tags } from '../util';
+import { BlobServiceAccountManager, DatabaseManager, Storages, Datasets } from '../util';
 import fs from 'fs';
 import path from 'path';
 
@@ -33,10 +33,6 @@ program
 			fs.mkdirSync(outputDir);
 		}
 
-		console.debug(
-			`loaded parameters: ${JSON.stringify({ database, azaccount, azaccountkey, containerNames })}`
-		);
-
 		const blobManager = new BlobServiceAccountManager(azaccount, azaccountkey, titilerUrl);
 		let storages: Storages;
 		if (containerNames) {
@@ -55,46 +51,9 @@ program
 		console.debug(`generated ${datasets.getDatasets().length} dataset objects`);
 
 		const dbManager = new DatabaseManager(database);
-		console.debug(`database manager was generated.`);
-		const tags: Tags = new Tags([]);
+		await dbManager.registerAll(storages, datasets);
 
-		try {
-			storages.addTags(tags);
-			datasets.addTags(tags);
-			const client = await dbManager.transactionStart();
-
-			await tags.insert(client);
-			console.debug(`${tags.getTags().length} tags were registered into PostGIS.`);
-
-			storages.updateTags(tags);
-			datasets.updateTags(tags);
-
-			await storages.insertAll(client);
-			console.debug(`${storages.getStorages().length} storages were registered into PostGIS.`);
-
-			await datasets.insertAll(client);
-			console.debug(`${datasets.getDatasets().length} datasets were registered into PostGIS.`);
-
-			await tags.cleanup(client);
-			console.debug(`unused tags were cleaned`);
-		} catch (e) {
-			await dbManager.transactionRollback();
-			throw e;
-		} finally {
-			await dbManager.transactionEnd();
-			console.timeEnd('azblob');
-		}
-
-		// for debug
-		[
-			{ file: 'tags.json', data: tags.getTags() },
-			{ file: 'storages.json', data: storages.getStorages() },
-			{ file: 'datasets.json', data: datasets.getDatasets() }
-		].forEach((data) => {
-			const filePath = path.resolve(outputDir, data.file);
-			fs.writeFileSync(filePath, JSON.stringify(data.data, null, 4));
-			console.debug(`exported ${filePath}`);
-		});
+		console.timeEnd('azblob');
 	});
 
 export default program;
