@@ -28,7 +28,8 @@ Options:
   -a, --azaccount <azure_storage_account>        Azure Storage Account
   -k, --azaccountkey <azure_storage_access_key>  Azure Storage Access Key
   -n, --name [container_name...]                 Targeted Azure Blob Container name to scan. It will scan all containers if it is not specified.
-  -o, --output [output]                          Output directory for temporary working folder. Default is tmp folder (default: "tmp")
+  -o, --output [output]                          Output directory for temporary working folder (default: "tmp")
+  -t, --titiler-url [titiler-url]                base URL for titiler (default: "https://titiler.undpgeohub.org")
   -h, --help                                     display help for command
 ```
 
