@@ -26,12 +26,14 @@ class BlobServiceAccountManager {
 	private blobServiceClient: BlobServiceClient;
 	private sasToken: string;
 	private baseUrl: string;
+	private titilerUrl: string;
 
-	constructor(azAccount: string, azAccountKey: string) {
+	constructor(azAccount: string, azAccountKey: string, titilerUrl: string) {
 		this.azAccount = azAccount;
 		this.azAccountKey = azAccountKey;
 
 		this.baseUrl = `https://${this.azAccount}.blob.core.windows.net`;
+		this.titilerUrl = titilerUrl;
 
 		const sharedKeyCredential = new StorageSharedKeyCredential(this.azAccount, this.azAccountKey);
 		this.blobServiceClient = new BlobServiceClient(this.baseUrl, sharedKeyCredential);
@@ -194,7 +196,7 @@ class BlobServiceAccountManager {
 
 	private async getRasterMetadata(url: string) {
 		const fileUrl = `${url}${this.sasToken}`;
-		const apiUrl = `https://titiler.undpgeohub.org/cog/info?url=${getBase64EncodedUrl(fileUrl)}`;
+		const apiUrl = `${this.titilerUrl}/cog/info?url=${getBase64EncodedUrl(fileUrl)}`;
 		const res = await fetch(apiUrl);
 		const json: RasterTileMetadata = await res.json();
 		const band_metadata = json.band_metadata;
