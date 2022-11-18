@@ -1,5 +1,5 @@
 {
-	"name": "geohub-cli",
+	"name": "@undp-data/geohub-cli",
 	"version": "1.0.0",
 	"description": "This repository is to manage CLI tools for GeoHub",
 	"main": "dist/index.js",
