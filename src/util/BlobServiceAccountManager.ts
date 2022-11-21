@@ -57,7 +57,7 @@ class BlobServiceAccountManager {
 			if (metadata.published !== 'true') continue;
 			const tagValues: string[] = metadata.tags.split(',');
 			const tags: Tag[] = tagValues.map((tag) => {
-				const t: Tag = { value: tag.trim() };
+				const t: Tag = { key: 'keyword', value: tag.trim() };
 				return t;
 			});
 			if (metadata.sdg) {

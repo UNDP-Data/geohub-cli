@@ -97,7 +97,7 @@ CREATE TABLE geohub.tag
 (
   id    serial            NOT NULL,
   value character varying NOT NULL,
-  key   character varying,
+  key   character varying NOT NULL,
   PRIMARY KEY (id)
 );
 
