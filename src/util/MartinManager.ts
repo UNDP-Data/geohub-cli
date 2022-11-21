@@ -16,7 +16,12 @@ class MartinManager {
 			label: 'Martin Vector Tiles API',
 			description: 'Dynamic vector tiles sources from PostGIS database',
 			icon: 'fa-solid fa-database',
-			tags: []
+			tags: [
+				{
+					key: 'type',
+					value: 'martin'
+				}
+			]
 		};
 
 		const res = await fetch(this.martinUrl);

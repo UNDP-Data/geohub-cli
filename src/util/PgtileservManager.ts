@@ -16,7 +16,12 @@ class PgtileservManager {
 			label: 'pgTileServ Vector Tiles API',
 			description: 'Dynamic vector tiles sources from PostGIS database',
 			icon: 'https://access.crunchydata.com/documentation/pg_tileserv/latest/crunchy-spatial-logo.png',
-			tags: []
+			tags: [
+				{
+					key: 'type',
+					value: 'pgtileserv'
+				}
+			]
 		};
 
 		const res = await fetch(this.pgtileservUrl);
