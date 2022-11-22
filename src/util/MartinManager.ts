@@ -45,7 +45,7 @@ class MartinManager {
 				storage: storage,
 				tags: [
 					{
-						key: 'source',
+						key: 'type',
 						value: 'martin'
 					},
 					{

@@ -55,11 +55,11 @@ class PgtileservManager {
 				storage: storage,
 				tags: [
 					{
-						key: 'source',
+						key: 'type',
 						value: 'pgtileserv'
 					},
 					{
-						key: 'type',
+						key: 'layertype',
 						value: layer.type
 					},
 					{
