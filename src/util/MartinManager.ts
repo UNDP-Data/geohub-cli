@@ -1,4 +1,4 @@
-import { generateHashKey } from '../helpers';
+import { cleanName, generateHashKey } from '../helpers';
 import { MartinIndexJson, Storage, Dataset } from '../interfaces';
 
 class MartinManager {
@@ -36,7 +36,7 @@ class MartinManager {
 				id: generateHashKey(datasetUrl),
 				url: datasetUrl,
 				is_raster: false,
-				name: layer.id,
+				name: `${layer.schema} ${cleanName(layer.table)}`,
 				description: `${layer.table} data in ${layer.schema} schema in PostGIS database`,
 				source: `United Nations Development Programme`,
 				bounds: layer.bounds,
@@ -67,6 +67,10 @@ class MartinManager {
 					{
 						key: 'srid',
 						value: layer.srid.toString()
+					},
+					{
+						key: 'id',
+						value: layer.id
 					}
 				]
 			};

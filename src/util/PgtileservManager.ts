@@ -1,4 +1,4 @@
-import { generateHashKey } from '../helpers';
+import { cleanName, generateHashKey } from '../helpers';
 import { Storage, Dataset, PgtileservIndexJson, PgtileservDetailJson } from '../interfaces';
 
 class PgtileservManager {
@@ -46,7 +46,7 @@ class PgtileservManager {
 				id: generateHashKey(detailJson.tileurl),
 				url: detailJson.tileurl,
 				is_raster: false,
-				name: layer.id,
+				name: `${layer.schema} ${cleanName(layer.name)}`,
 				description: layer.description,
 				source: `United Nations Development Programme`,
 				bounds: bounds,
@@ -69,6 +69,10 @@ class PgtileservManager {
 					{
 						key: 'table',
 						value: layer.name
+					},
+					{
+						key: 'id',
+						value: layer.id
 					}
 				]
 			};
