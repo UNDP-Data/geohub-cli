@@ -1,3 +1,5 @@
+# This repo was moved into [geohub](https://github.com/UNDP-Data/geohub), and it will be deleted soon
+
 # geohub-cli
 
 This repository is to manage CLI tools for geohub
